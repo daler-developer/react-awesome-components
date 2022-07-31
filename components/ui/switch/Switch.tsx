@@ -8,6 +8,7 @@ interface IProps {
 export default ({ checked, onChange }: IProps) => {
   return (
     <div
+      role="switch"
       onClick={() => onChange(!checked)}
       className={cn(
         'h-6 w-10 absolute rounded-2xl p-[2.4px] cursor-pointer',
