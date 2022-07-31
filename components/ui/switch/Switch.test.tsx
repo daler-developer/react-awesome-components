@@ -3,7 +3,6 @@ import userEvent from '@testing-library/user-event'
 import Switch from './Switch'
 
 describe('<Switch />', () => {
-
   test('should render correctly', () => {
     render(<Switch checked onChange={() => {}} />)
 
@@ -18,7 +17,7 @@ describe('<Switch />', () => {
     render(<Switch checked={true} onChange={onChange} />)
 
     await user.click(screen.getByRole('switch'))
-  
+
     expect(onChange).toBeCalledTimes(1)
   })
 
@@ -45,6 +44,4 @@ describe('<Switch />', () => {
 
     expect(onChange.mock.calls[0][0]).toEqual(true)
   })
-
 })
-

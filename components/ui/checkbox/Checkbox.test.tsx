@@ -3,13 +3,12 @@ import userEvent from '@testing-library/user-event'
 import Checkbox from './Checkbox'
 
 describe('<Checkbox />', () => {
-
   test('should render', () => {
     render(<Checkbox checked={true} onChange={() => {}} />)
 
     expect(screen.queryByRole('checkbox')).toBeInTheDocument()
   })
-  
+
   test("'onChange' prop function should be called when clicking on root element", async () => {
     const user = userEvent.setup()
 
@@ -18,7 +17,7 @@ describe('<Checkbox />', () => {
     render(<Checkbox checked={true} onChange={onChange} />)
 
     await user.click(screen.getByRole('checkbox'))
-  
+
     expect(onChange).toBeCalledTimes(1)
   })
 
@@ -45,5 +44,4 @@ describe('<Checkbox />', () => {
 
     expect(onChange.mock.calls[0][0]).toEqual(true)
   })
-
 })
