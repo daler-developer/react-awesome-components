@@ -1,0 +1,7 @@
+{
+  "explorer.decorations.colors": false,
+  "explorer.decorations.badges": false,
+  "explorer.excludeGitIgnore": true,
+  "explorer.fileNesting.enabled": false,
+  "explorer.fileNesting.expand": true
+}
