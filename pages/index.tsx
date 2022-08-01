@@ -1,19 +1,21 @@
 import { useEffect, useState } from 'react'
 import Pagination from '../components/pagination/Pagination'
+import Tabs from '../components/tabs/Tabs'
 
 export default () => {
-  const [page, setPage] = useState<number>(1)
-
-  useEffect(() => {
-    console.log(page)
-  })
+  const [tab, setTab] = useState('first')
 
   return (
-    <div className='m-4'>
-      <Pagination
-        currentPage={page}
-        totalPages={3}
-        onChange={(to) => setPage(to)}
+    <div className='p-20'>
+      <Tabs
+        initialActiveTab={tab}
+        onChange={(tab) => setTab(tab)}
+        align='right'
+        items={[
+          { label: 'First', name: 'first' },
+          { label: 'Second', name: 'second' },
+          { label: 'Third', name: 'third' },
+        ]}
       />
     </div>
   )
