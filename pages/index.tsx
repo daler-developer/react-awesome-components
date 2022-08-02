@@ -1,14 +1,14 @@
-import {
-  ComponentType,
-  ElementType,
-  isValidElement,
-  ReactElement,
-  ReactNode,
-  useEffect,
-  useState,
-} from 'react'
-import Tab from '../components/tabs/tab/Tab'
+import {} from 'react'
+import Carousel from '../components/carousel/Carousel'
 
 export default () => {
-  return <div></div>
+  return (
+    <div>
+      <Carousel onChangeSlide={(to) => alert(to)}>
+        <Carousel.Slide>1</Carousel.Slide>
+        <Carousel.Slide>1</Carousel.Slide>
+        <Carousel.Slide>1</Carousel.Slide>
+      </Carousel>
+    </div>
+  )
 }

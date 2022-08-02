@@ -5,5 +5,9 @@ interface IProps {
 }
 
 export default forwardRef(({ children }: IProps, ref: any) => {
-  return <div ref={ref}>{children}</div>
+  return (
+    <div ref={ref} role='carousel-slide'>
+      {children}
+    </div>
+  )
 })

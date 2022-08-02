@@ -55,6 +55,7 @@ export default function Tabs({
       {items.map((item) => (
         <Tab
           {...item}
+          key={item.name}
           isActive={activeTab === item.name}
           onClick={handleTabClick}
           ref={(el) => (tabRefs.current[item.name] = el)}

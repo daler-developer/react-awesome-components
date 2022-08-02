@@ -10,7 +10,7 @@ import {
 import CarouselSlide from './carousel-slide/CarouselSlide'
 
 interface IProps {
-  children: ReactElement[]
+  children: ReactElement[] | ReactElement
   autoPlay?: boolean
   onChangeSlide?: (slideIndex: number) => void
   defaultActiveSlideIndex?: number
@@ -32,13 +32,19 @@ export default function Carousel({
   const wrapperRef = useRef<HTMLDivElement>(null!)
   const slidesRefs = useRef<HTMLElement[]>([])
 
-  const slidesCount = children.length
+  const slidesCount = Array.isArray(children) ? children.length : 1
+
+  const isFirstRender = useRef(true)
 
   useEffect(() => {
+    // if (isFirstRender.current === false) {
     if (onChangeSlide) {
       onChangeSlide(activeSlideIndex)
     }
-  }, [activeSlideIndex])
+    // } else {
+    // isFirstRender.current = false
+    // }
+  }, [activeSlideIndex, onChangeSlide])
 
   useEffect(() => {
     const interval = setInterval(() => {
@@ -76,12 +82,13 @@ export default function Carousel({
 
   const dots = []
 
-  for (let i = 0; i < children.length; i++) {
+  for (let i = 0; i < slidesCount; i++) {
     dots.push(i)
   }
 
   return (
     <div
+      role='carousel'
       ref={wrapperRef}
       className={cn('border-[2px] relative overflow-hidden')}
     >
@@ -92,6 +99,7 @@ export default function Carousel({
         {Children.map(children, (child, i) =>
           cloneElement(child, {
             ref: (el: HTMLElement) => (slidesRefs.current[i] = el),
+            key: i,
           })
         )}
       </div>
