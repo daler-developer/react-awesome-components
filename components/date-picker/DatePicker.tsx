@@ -1,15 +1,23 @@
 import cn from 'classnames'
-import { useEffect, useRef, useState } from 'react'
+import { FormEvent, useEffect, useRef, useState } from 'react'
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronDoubleLeftIcon,
   ChevronDoubleRightIcon,
+  XCircleIcon,
 } from '@heroicons/react/solid'
+import { CalendarIcon } from '@heroicons/react/outline'
 import dayjs, { Dayjs } from 'dayjs'
 import Cell from './cell/Cell'
+import useClickOutside from '../../hooks/useClickOutside'
+import customParseFormat from 'dayjs/plugin/customParseFormat'
 
-interface IProps {}
+dayjs.extend(customParseFormat)
+
+interface IProps {
+  onChange: (date: string | null) => void
+}
 
 const months = [
   'Jan',
@@ -28,8 +36,11 @@ const months = [
 
 const weeks = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su']
 
-export default ({}: IProps) => {
+const format = 'YYYY-MM-DD'
+
+export default ({ onChange }: IProps) => {
   const today = useRef(dayjs())
+  const rootElRef = useRef<HTMLDivElement>(null!)
 
   const [inputValue, setInputValue] = useState('')
   const [isPopupOpen, setIsPopupOpen] = useState(false)
@@ -39,21 +50,63 @@ export default ({}: IProps) => {
     month: today.current.month(),
   })
 
+  useClickOutside(() => {
+    setIsPopupOpen(false)
+  }, rootElRef)
+
+  useEffect(() => {
+    onChange(date ? date.format(format) : null)
+  }, [date])
+
   useEffect(() => {
     if (date) {
       setInputValue(date.format('YYYY-MM-DD'))
+    } else if (!date) {
+      setInputValue('')
     }
   }, [date])
+
+  useEffect(() => {
+    const generatedDate = dayjs(inputValue, 'YYYY-MM-DD', true)
+
+    if (generatedDate.isValid()) {
+      setDate(generatedDate)
+      setPage({
+        ...page,
+        year: generatedDate.year(),
+        month: generatedDate.month(),
+      })
+    }
+  }, [inputValue])
+
+  const handleInputBlue = () => {
+    if (!dayjs(inputValue, format, true).isValid()) {
+      if (date) {
+        setInputValue(date.format(format))
+      } else {
+        setInputValue('')
+      }
+    }
+  }
 
   const isCurrentMonthPageOpened =
     today.current.year() === page.year && today.current.month() === page.month
 
   const handleCellClick = (date: number) => {
     setDate(dayjs().year(page.year).month(page.month).date(date))
+    setIsPopupOpen(false)
   }
 
   const handleClickToday = () => {
     setDate(today.current)
+    setIsPopupOpen(true)
+  }
+
+  const handleClearInput = (e: FormEvent<Element>) => {
+    e.stopPropagation()
+
+    setDate(null)
+    setIsPopupOpen(false)
   }
 
   const switchToPrevYear = () => {
@@ -72,8 +125,7 @@ export default ({}: IProps) => {
 
   const switchToPrevMonth = () => {
     if (page.month === 0) {
-      switchToPrevYear()
-      // setPage({ ...page, month: 11 })
+      setPage((prev) => ({ ...page, year: prev.year - 1, month: 11 }))
     } else {
       setPage({
         ...page,
@@ -85,7 +137,7 @@ export default ({}: IProps) => {
   const switchToNextMonth = () => {
     if (page.month === 11) {
       switchToNextYear()
-      // setPage({ ...page, month: 0 })
+      setPage((prev) => ({ ...page, year: page.year - 1, month: 0 }))
     } else {
       setPage({
         ...page,
@@ -96,23 +148,46 @@ export default ({}: IProps) => {
 
   return (
     <div
-      className={cn('relative select-none')}
-      onClick={() => setIsPopupOpen(true)}
+      ref={rootElRef}
+      onClick={() => !isPopupOpen && setIsPopupOpen(true)}
+      className={cn('relative select-none inline-block')}
     >
-      <div className={cn('flex h-[30px] w-[150px] border border-gray-400')}>
+      <div
+        className={cn(
+          'flex items-center gap-[5px] px-[8px] h-[30px] w-[150px] border border-gray-400 rounded-[4px]'
+        )}
+      >
         <input
-          className={cn('min-w-0 px-[5px] outline-none')}
+          className={cn('min-w-0 outline-none text-[14px]')}
           placeholder='Select date'
           value={inputValue}
+          onChange={(e) => setInputValue(e.currentTarget.value)}
+          onBlur={handleInputBlue}
           type='text'
         />
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className={cn('group', { 'cursor-pointer': !!date })}
+        >
+          <CalendarIcon
+            className={cn('w-[20px] 1h-[20px] text-gray-500', {
+              'group-hover:hidden': !!date,
+            })}
+          />
+          <XCircleIcon
+            onClick={handleClearInput}
+            className={cn('w-[20px] h-[20px] text-gray-500 hidden', {
+              'group-hover:block': !!date,
+            })}
+          />
+        </div>
       </div>
       {/* Popup */}
       <div
         className={cn(
-          'absolute top-full left-0 rounded-sm shadow-lg transition-all',
+          'absolute top-full left-0 rounded-sm transition-all shadow-2xl w-max',
           {
-            'opacity-0 scale-y-0 origin-top': !isPopupOpen,
+            'opacity-0 invisible': !isPopupOpen,
           }
         )}
       >
@@ -128,7 +203,7 @@ export default ({}: IProps) => {
               className='w-[18px] h-[18px] cursor-pointer'
             />
           </div>
-          <div className='text-black font-bold'>
+          <div className='text-black text-[15px] font-bold'>
             {months[page.month]} {page.year}
           </div>
           <div className='flex items-center gap-[5px]'>

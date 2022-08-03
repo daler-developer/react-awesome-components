@@ -17,6 +17,7 @@ export default ({
 }: IProps) => {
   return (
     <div
+      role='date-picker-cell'
       {...(onClick && { onClick: () => onClick(children as number) })}
       className={cn(
         'w-[25px] h-[25px] rounded-[3px] flex items-center justify-center',
