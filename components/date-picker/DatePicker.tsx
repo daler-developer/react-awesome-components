@@ -11,9 +11,7 @@ import { CalendarIcon } from '@heroicons/react/outline'
 import dayjs, { Dayjs } from 'dayjs'
 import Cell from './cell/Cell'
 import useClickOutside from '../../hooks/useClickOutside'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
-
-dayjs.extend(customParseFormat)
+import useIsFirstRender from '../../hooks/useIsFirstRender'
 
 interface IProps {
   onChange: (date: string | null) => void
@@ -54,8 +52,12 @@ export default ({ onChange }: IProps) => {
     setIsPopupOpen(false)
   }, rootElRef)
 
+  const isFirstRender = useIsFirstRender()
+
   useEffect(() => {
-    onChange(date ? date.format(format) : null)
+    if (!isFirstRender) {
+      onChange(date ? date.format(format) : null)
+    }
   }, [date])
 
   useEffect(() => {
@@ -66,8 +68,20 @@ export default ({ onChange }: IProps) => {
     }
   }, [date])
 
-  useEffect(() => {
-    const generatedDate = dayjs(inputValue, 'YYYY-MM-DD', true)
+  const handleInputBlue = () => {
+    if (!dayjs(inputValue, format, true).isValid()) {
+      if (date) {
+        setInputValue(date.format(format))
+      } else {
+        setInputValue('')
+      }
+    }
+  }
+
+  const handleInputChange = (e: FormEvent<HTMLInputElement>) => {
+    setInputValue(e.currentTarget.value)
+
+    const generatedDate = dayjs(e.currentTarget.value, 'YYYY-MM-DD', true)
 
     if (generatedDate.isValid()) {
       setDate(generatedDate)
@@ -76,16 +90,6 @@ export default ({ onChange }: IProps) => {
         year: generatedDate.year(),
         month: generatedDate.month(),
       })
-    }
-  }, [inputValue])
-
-  const handleInputBlue = () => {
-    if (!dayjs(inputValue, format, true).isValid()) {
-      if (date) {
-        setInputValue(date.format(format))
-      } else {
-        setInputValue('')
-      }
     }
   }
 
@@ -148,6 +152,7 @@ export default ({ onChange }: IProps) => {
 
   return (
     <div
+      role='date-picker'
       ref={rootElRef}
       onClick={() => !isPopupOpen && setIsPopupOpen(true)}
       className={cn('relative select-none inline-block')}
@@ -158,10 +163,11 @@ export default ({ onChange }: IProps) => {
         )}
       >
         <input
+          role='input'
           className={cn('min-w-0 outline-none text-[14px]')}
           placeholder='Select date'
           value={inputValue}
-          onChange={(e) => setInputValue(e.currentTarget.value)}
+          onChange={handleInputChange}
           onBlur={handleInputBlue}
           type='text'
         />
@@ -184,6 +190,7 @@ export default ({ onChange }: IProps) => {
       </div>
       {/* Popup */}
       <div
+        role='date-picker-popup'
         className={cn(
           'absolute top-full left-0 rounded-sm transition-all shadow-2xl w-max',
           {
@@ -192,7 +199,10 @@ export default ({ onChange }: IProps) => {
         )}
       >
         {/* HEADER */}
-        <div className='border-b border-gray-200 p-[13px] flex items-center justify-between text-gray-400'>
+        <div
+          role='popup-header'
+          className='border-b border-gray-200 p-[13px] flex items-center justify-between text-gray-400'
+        >
           <div className='flex items-center gap-[5px]'>
             <ChevronDoubleLeftIcon
               onClick={switchToPrevYear}

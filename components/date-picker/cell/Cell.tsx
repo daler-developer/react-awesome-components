@@ -17,6 +17,7 @@ export default ({
 }: IProps) => {
   return (
     <div
+      data-testid={`date-picker-cell-${children}`}
       role='date-picker-cell'
       {...(onClick && { onClick: () => onClick(children as number) })}
       className={cn(

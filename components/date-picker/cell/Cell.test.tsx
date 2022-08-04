@@ -41,7 +41,7 @@ describe('<Cell />', () => {
       </Cell>
     )
 
-    expect(screen.getByRole('date-picker-cell')).toHaveClass(
+    expect(screen.getByRole('date-picker-cell')).not.toHaveClass(
       'border border-blue-500'
     )
 
@@ -51,7 +51,7 @@ describe('<Cell />', () => {
       </Cell>
     )
 
-    expect(screen.getByRole('date-picker-cell')).not.toHaveClass(
+    expect(screen.getByRole('date-picker-cell')).toHaveClass(
       'border border-blue-500'
     )
   })
