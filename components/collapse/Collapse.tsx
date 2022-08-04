@@ -7,7 +7,11 @@ interface IProps {
 }
 
 export default function Collapse({ children }: IProps) {
-  return <div className={cn('')}>{children}</div>
+  return (
+    <div role='collapse' className={cn('')}>
+      {children}
+    </div>
+  )
 }
 
 Collapse.Item = CollapseItem
