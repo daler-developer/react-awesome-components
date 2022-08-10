@@ -1,55 +1,32 @@
 import cn from 'classnames'
 import { ArrowUpIcon, ArrowDownIcon } from '@heroicons/react/solid'
-import { FormEvent, useMemo, useState } from 'react'
+import { FormEvent, isValidElement, useEffect, useMemo, useState } from 'react'
 
 interface IProps {
   min: number
   max: number
   onChange: (value: number) => void
-  step: number
+  step?: number
   initialValue: number
 }
 
-const allDigits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
-
-export default ({ min, max, onChange, initialValue, step }: IProps) => {
+export default ({ min, max, onChange, initialValue, step = 1 }: IProps) => {
   const [value, setValue] = useState(String(initialValue))
 
   const validatedValue = useMemo(() => {
-    let v: any
+    let converted = Number(value)
 
-    v = value
-      .split('')
-      .filter((char) => allDigits.includes(char))
-      .join('')
-
-    if (!v) {
-      v = min
-
-      return v as number
+    if (Number.isNaN(converted)) {
+      return initialValue
+    }
+    if (converted < min) {
+      return min
+    }
+    if (converted > max) {
+      return max
     }
 
-    v = Number(v)
-
-    if (Number.isNaN(v)) {
-      v = 1
-
-      return v as number
-    }
-
-    if (v < min) {
-      v = min
-
-      return v as number
-    }
-
-    if (v > max) {
-      v = max
-
-      return v as number
-    }
-
-    return v as number
+    return initialValue
   }, [value])
 
   const isValueValid = useMemo(
@@ -67,23 +44,34 @@ export default ({ min, max, onChange, initialValue, step }: IProps) => {
   }
 
   const handleIncrease = () => {
-    if (validatedValue < max) {
-      setValue(String(validatedValue + step))
-      onChange(validatedValue + step)
+    const newValue = validatedValue + step
+
+    if (newValue > max) {
+      return
     }
+
+    setValue(String(newValue))
+    onChange(newValue)
   }
 
   const handleDecrease = () => {
-    if (validatedValue > min) {
-      setValue(String(validatedValue - step))
-      onChange(validatedValue - step)
+    const newValue = validatedValue - step
+
+    if (newValue < min) {
+      return
     }
+
+    setValue(String(newValue))
+    onChange(newValue)
   }
 
   return (
     <div
       className={cn(
-        'group h-8 w-32 flex border border-gray-300 hover:border-blue-300 cursor-pointer transition-all rounded-sm',
+        'group h-8 w-32 flex border border-gray-300  cursor-pointer transition-all rounded-sm',
+        {
+          'hover:border-blue-300': isValueValid,
+        },
         {
           'border-red-600': !isValueValid,
         }

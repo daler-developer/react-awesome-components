@@ -6,6 +6,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        '3xl': '0 3px 6px -4px #0000001f, 0 6px 16px #00000014, 0 9px 28px 8px #0000000d'
+      },
       animation: {
         'spin-first-dot-pulse-color': 'spin-dot-pulse-color 1s 0s linear infinite alternate',
         'spin-second-dot-pulse-color': 'spin-dot-pulse-color 1s 0.25s linear infinite alternate',
